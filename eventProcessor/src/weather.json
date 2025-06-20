@@ -1,0 +1,11 @@
+{
+    "timestamp": "2023-05-11T14:00:00Z",
+    "city": "New York",
+    "date": "2023-05-11",
+    "temperature": 20,
+    "humidity": 60,
+    "windSpeed": 10,
+    "windDirection": "NW",
+    "precipitation": 0,
+    "pressure": 1013
+}

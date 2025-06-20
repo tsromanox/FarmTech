@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb/data:/data/db # Alterado para usar a pasta local
+      #- mongodb_data:/data/db # Uncomment if you want to use a named volume
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # RabbitMQ default port
+      - "15672:15672"  # RabbitMQ management UI
+      - "1883:1883"  # MQTT port
+    volumes:
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_MQTT_PORT: 1883
+      RABBITMQ_MQTT_ENABLED: "true"
+    restart: unless-stopped
+
+#volumes: # Uncomment if you want to use a named volume
+  #mongodb_data: # Uncomment if you want to use a named volume
