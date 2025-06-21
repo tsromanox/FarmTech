@@ -1,47 +1,125 @@
 # Projeto FarmTech - Sistema Inteligente de Monitoramento Agrícola
 
+# FIAP - Faculdade de Informática e Administração Paulista
+
+<p align="center">
+<a href= "https://www.fiap.com.br/"><img src="assets/logo-fiap.png" alt="FIAP - Faculdade de Informática e Admnistração Paulista" border="0" width=40% height=40%></a>
+</p>
+
+<br>
+
+## **Projeto Base: Sistema de Irrigação Inteligente Simulado**
+
+## FarmTech Solutions
+
+## 👨‍🎓 Integrantes: 
+- <a href="https://www.linkedin.com/company/inova-fusca">Anna Cecilia Moreira Cabral</a>
+- <a href="https://www.linkedin.com/company/inova-fusca">Heitor Exposito de Sousa</a>
+- <a href="https://www.linkedin.com/company/inova-fusca">Letícia Gomez Pinheiro</a> 
+- <a href="https://www.linkedin.com/company/inova-fusca">Thiago Sabato Romano</a> 
+- <a href="https://www.linkedin.com/company/inova-fusca">Vicenzo de Simone Montefusco</a>
+
+## 👩‍🏫 Professores:
+### Tutor(a) 
+- <a href="https://www.linkedin.com/company/inova-fusca">Leonardo Ruiz Orabona</a>
+### Coordenador(a)
+- <a href="https://www.linkedin.com/company/inova-fusca">Andre Godoi Chiovato</a>
+
 Bem-vindo ao FarmTech! Esta é uma solução completa de IoT e Análise de Dados, projetada para monitorar, automatizar e otimizar operações agrícolas. O sistema coleta dados em tempo real do campo, os processa na nuvem e aplica modelos de Machine Learning para gerar insights valiosos.
 
 ## Visão Geral da Arquitetura
 
-A arquitetura é composta por um dispositivo de campo (`FarmTechIOT`), um pipeline de processamento de eventos (`eventProcessor`), um banco de dados, um componente de análise (`FarmTechML`) e recursos de infraestrutura (`event-resource`).
-
-```mermaid
-flowchart TD
-    subgraph CAMPO [Dispositivo de Campo]
-        FT_IOT[ESP32<br/>FarmTechIOT]
-    end
-
-    subgraph NUVEM [Backend / Cloud]
-        MQTT_BROKER[Broker MQTT<br/>(RabbitMQ/MQTT)]
-        EVENT_PROC[eventProcessor<br/>(Python)]
-        MONGODB[(MongoDB)]
-        ML[FarmTechML<br/>(Python ML)]
-        INSIGHTS((Insights & Previsões))
-    end
-
-    subgraph INFRA [Infraestrutura & CI/CD]
-        EVENT_RESOURCE[event-resource<br/>(IaC, Docker, Schemas)]
-    end
-
-    FT_IOT -- "1. Publica dados (JSON via MQTT)" --> MQTT_BROKER
-    MQTT_BROKER -- "2. Encaminha dados" --> EVENT_PROC
-    EVENT_PROC -- "3. Armazena dados brutos" --> MONGODB
-    ML -- "4. Lê dados históricos" --> MONGODB
-    ML -- "5. Gera insights/modelos" --> INSIGHTS
-
-    EVENT_RESOURCE -- "Provisiona/Define" --> MQTT_BROKER
-    EVENT_RESOURCE -- "Provisiona/Define" --> EVENT_PROC
-    EVENT_RESOURCE -- "Provisiona/Define" --> MONGODB
-    EVENT_RESOURCE -- "Provisiona/Define" --> ML
-
-    style FT_IOT fill:#b6e7a6,stroke:#333,stroke-width:2px
-    style EVENT_PROC fill:#a6d8f7,stroke:#333,stroke-width:2px
-    style ML fill:#ffd59a,stroke:#333,stroke-width:2px
-    style EVENT_RESOURCE fill:#e0e0e0,stroke:#333,stroke-width:2px
-```
+O FarmTech é composto por múltiplos módulos integrados, cada um responsável por uma etapa do fluxo de dados, automação e inteligência agrícola. A seguir, detalhamos cada componente e suas interações:
 
 ---
+
+### 1. Dispositivo de Campo (`FarmTechIoT`)
+- **Função:** Coleta dados ambientais (umidade, temperatura, luminosidade, etc.) e executa automações locais.
+- **Hardware:** ESP32 (ou similar), sensores ambientais, atuadores (ex: relé para bomba d’água).
+- **Firmware:** Desenvolvido em C++ (Arduino Framework).
+- **Comunicação:** Envia dados em JSON via MQTT para o backend, utilizando Wi-Fi.
+- **Automação Local:** Executa regras pré-configuradas para garantir operação mesmo offline.
+- **Segurança:** Suporte a autenticação MQTT e criptografia (TLS, se configurado).
+
+---
+
+### 2. Broker de Mensagens (RabbitMQ/MQTT)
+- **Função:** Centraliza a comunicação entre dispositivos e backend, desacoplando produtores e consumidores de eventos.
+- **Tecnologia:** RabbitMQ com plugin MQTT.
+- **Portas:** 
+  - MQTT: 1883 (padrão)
+  - AMQP: 5672
+  - UI de Gerenciamento: 15672
+- **Recursos:** Suporte a múltiplos tópicos, autenticação, plugins para extensibilidade.
+
+---
+
+### 3. Processador de Eventos (`eventProcessor`)
+- **Função:** Consome mensagens MQTT, valida, enriquece e armazena os dados.
+- **Tecnologia:** Python.
+- **Principais Responsabilidades:**
+  - Conexão robusta com o broker MQTT.
+  - Decodificação e validação de mensagens JSON.
+  - Enriquecimento dos dados com metadados (timestamp, ID do dispositivo, etc.).
+  - Armazenamento eficiente no MongoDB.
+  - Tratamento de falhas e reconexão automática.
+
+---
+
+### 4. Banco de Dados (MongoDB)
+- **Função:** Armazena eventos históricos, permitindo consultas rápidas e flexíveis.
+- **Tecnologia:** MongoDB (NoSQL, orientado a documentos).
+- **Vantagens:** 
+  - Escalabilidade horizontal.
+  - Suporte a dados semi-estruturados.
+  - Consultas flexíveis para análise e ML.
+
+---
+
+### 5. Análise e Machine Learning (`FarmTechML`)
+- **Função:** Realiza análise exploratória, treinamento de modelos e inferência.
+- **Tecnologia:** Python (Pandas, Scikit-learn, TensorFlow/PyTorch, Jupyter Notebooks).
+- **Principais Atividades:**
+  - Análise de padrões históricos.
+  - Treinamento de modelos preditivos (ex: previsão de irrigação).
+  - Detecção de anomalias em leituras de sensores.
+  - Geração de relatórios e dashboards.
+  - Exportação de modelos para uso em produção.
+
+---
+
+### 6. Recursos de Infraestrutura (`event-resource`)
+- **Função:** Centraliza a definição e automação da infraestrutura e contratos de dados.
+- **Tecnologias:** Docker, Docker Compose, Terraform, JSON Schema, OpenAPI.
+- **Responsabilidades:**
+  - Orquestração dos serviços (MongoDB, RabbitMQ, eventProcessor).
+  - Infraestrutura como Código (IaC) para ambientes replicáveis.
+  - Definição de contratos de dados (schemas) e APIs (OpenAPI).
+  - Scripts de provisionamento e documentação.
+
+---
+
+### 7. Fluxo de Dados
+
+1. **Coleta:** Dispositivos de campo capturam dados e publicam via MQTT.
+2. **Ingestão:** Broker recebe e encaminha eventos ao processador.
+3. **Processamento:** Dados são validados e enriquecidos pelo eventProcessor.
+4. **Armazenamento:** Dados persistidos no MongoDB.
+5. **Análise:** FarmTechML acessa dados históricos para gerar inteligência.
+6. **Ação:** Insights podem ser usados para automação ou visualização em dashboards.
+
+---
+
+### 8. Segurança e Resiliência
+
+- **Autenticação:** Usuários e dispositivos autenticados no broker.
+- **Persistência:** Dados armazenados de forma segura e redundante.
+- **Recuperação:** Serviços configurados para reinício automático e tolerância a falhas.
+- **Monitoramento:** Logs e métricas disponíveis para acompanhamento do sistema.
+
+---
+
+Esta arquitetura modular permite fácil expansão, manutenção e integração com novos sensores, atuadores ou algoritmos de análise, tornando o FarmTech uma solução robusta para agricultura
 
 ## Estrutura de Diretórios
 
