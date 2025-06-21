@@ -1,49 +1,90 @@
-# Event Consumer
+# event-resource — Infraestrutura do Backend FarmTech
 
-This project is designed to consume events from a RabbitMQ MQTT topic and insert them into a MongoDB database. It consists of a Python application that connects to RabbitMQ, subscribes to a specified topic, and processes incoming messages.
+Este diretório define e provisiona a infraestrutura essencial para o backend do FarmTech, utilizando Docker Compose para orquestrar MongoDB e RabbitMQ (com suporte MQTT).
 
-## Project Structure
+---
+
+## 📁 Estrutura do Diretório
 
 ```
-event-consumer
-├── src
-│   ├── consumer.py       # Main logic for consuming events
-│   └── config.py         # Configuration settings
-├── requirements.txt       # Python dependencies
-├── docker-compose.yml      # Docker services configuration
-└── README.md              # Project documentation
+event-resource/
+├── docker-compose.yml         # Orquestração dos serviços MongoDB e RabbitMQ/MQTT
+├── requirements.txt           # Dependências Python para integração com os serviços
+├── mongodb/
+│   └── data/                  # Persistência de dados do MongoDB (volume local)
+├── rabbitmq/
+│   └── enabled_plugins        # Plugins habilitados no RabbitMQ (inclui MQTT)
+└── README.md                  # Este arquivo
 ```
 
-## Setup Instructions
+---
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd event-consumer
-   ```
+## 🚀 Serviços Provisionados
 
-2. **Build and run the services using Docker Compose:**
-   ```bash
+- **MongoDB**
+  - Banco de dados NoSQL para armazenamento dos eventos coletados.
+  - Porta padrão: `27017`
+  - Dados persistidos em `mongodb/data/`.
+
+- **RabbitMQ (com MQTT)**
+  - Broker de mensagens com suporte ao protocolo MQTT, permitindo integração com dispositivos IoT e aplicações Python.
+  - Porta AMQP: `5672`
+  - Porta MQTT: `1883`
+  - Interface de gerenciamento: [http://localhost:15672](http://localhost:15672)
+    - Usuário: `user`
+    - Senha: `password`
+  - Plugins habilitados: MQTT, Management (ver [`rabbitmq/enabled_plugins`](rabbitmq/enabled_plugins))
+
+---
+
+## ⚙️ Como Subir o Ambiente
+
+1. **Suba os serviços com Docker Compose:**
+   ```sh
    docker-compose up -d
    ```
+   Isso iniciará MongoDB e RabbitMQ com MQTT habilitado.
 
-   This command will start the MongoDB and RabbitMQ services with MQTT enabled.
-
-3. **Install Python dependencies:**
-   You can install the required Python packages by running:
-   ```bash
-   pip install -r requirements.txt
+2. **Verifique os containers:**
+   ```sh
+   docker ps
    ```
 
-## Usage
+3. **Acesse o RabbitMQ Management UI:**  
+   [http://localhost:15672](http://localhost:15672)  
+   Usuário: `user` &nbsp;&nbsp; Senha: `password`
 
-- The consumer will automatically connect to the RabbitMQ server and start listening for messages on the specified MQTT topic.
-- Incoming messages will be processed and inserted into the MongoDB database.
+---
 
-## Configuration
+## 🐍 Dependências Python
 
-- Modify the `src/config.py` file to update the RabbitMQ connection parameters and MongoDB connection string as needed.
+Se for rodar consumidores/produtores Python fora do container, instale as dependências:
+```sh
+pip install -r requirements.txt
+```
+- **aio-pika**: Cliente assíncrono para RabbitMQ (AMQP)
+- **pymongo**: Cliente MongoDB para Python
+- **dnspython**: Suporte a DNS para conexões MongoDB
 
-## License
+---
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+## 📝 Observações e Customizações
+
+- Para alterar configurações (usuário, senha, nomes de volumes), edite o arquivo [`docker-compose.yml`](docker-compose.yml).
+- O diretório `mongodb/data/` garante persistência dos dados mesmo após reiniciar os containers.
+- O arquivo [`rabbitmq/enabled_plugins`](rabbitmq/enabled_plugins) garante que o plugin MQTT esteja ativo.
+- Caso queira usar volumes nomeados do Docker, descomente as linhas correspondentes em `docker-compose.yml`.
+
+---
+
+## 🛠️ Troubleshooting
+
+- **Portas em uso:** Certifique-se de que as portas `27017`, `5672`, `15672` e `1883` estejam livres.
+- **Persistência:** Se quiser limpar os dados do MongoDB, apague o conteúdo da pasta `mongodb/data/` com os containers parados.
+- **Logs:** Use `docker-compose logs -f` para acompanhar os logs dos serviços.
+
+---
+
+## 📄 Licença
+
+MIT
