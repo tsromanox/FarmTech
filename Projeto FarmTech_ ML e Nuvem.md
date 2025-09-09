@@ -445,7 +445,7 @@ A seguir, a captura de tela da estimativa de custos mensais para a configuraçã
 
 A seguir, a captura de tela da estimativa de custos mensais para a mesma configuração na região da Virgínia do Norte.
 
-!(https://i.imgur.com/your-screenshot-link-for-n-virginia.png) * Custo Mensal Estimado (Virgínia do Norte):  
+* Custo Mensal Estimado (Virgínia do Norte):  
 * Instância EC2 (t4g.small): $12.26 USD  
 * Volume EBS (gp3, 50 GB): $4.00 USD  
 * Total Mensal: $16.26 USD
